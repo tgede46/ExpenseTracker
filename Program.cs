@@ -63,6 +63,8 @@ namespace ExpenseTracker
             // Add authentication and authorization services
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
+            builder.Services.AddScoped<IExpenseService, ExpenseService>();
+
 
             // Register your services and repositories here
             builder.Services.AddScoped<IAuthService, AuthService>();

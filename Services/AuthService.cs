@@ -1,29 +1,59 @@
+using ExpenseTracker.Models;
 using ExpenseTracker.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace ExpenseTracker.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IAuthService _authService;
-        
-        public AuthService(IAuthService authService)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public AuthService(UserManager<ApplicationUser> userManager)
         {
-            _authService = authService;
+            _userManager = userManager;
         }
-        
-        public async Task<string> RegisterAsync(string fullName, string email, string password)
+
+        public async Task<string> RegisterAsync(
+            string fullName,
+            string email,
+            string password)
         {
-            return await _authService.RegisterAsync(fullName, email, password);
+            var user = new ApplicationUser
+            {
+                UserName = email,
+                Email = email,
+                FullName = fullName,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var result = await _userManager.CreateAsync(user, password);
+
+            if (!result.Succeeded)
+            {
+                return string.Join(
+                    ", ",
+                    result.Errors.Select(error => error.Description));
+            }
+
+            return "User registered successfully.";
         }
 
         public async Task<string> LoginAsync(string email, string password)
         {
-            return await _authService.LoginAsync(email, password);
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null ||
+                !await _userManager.CheckPasswordAsync(user, password))
+            {
+                return "Invalid email or password.";
+            }
+
+            return "Login successful.";
         }
 
-        public async Task LogoutAsync()
+        public Task LogoutAsync()
         {
-            await _authService.LogoutAsync();
+            return Task.CompletedTask;
         }
     }
 }

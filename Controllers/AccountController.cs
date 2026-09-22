@@ -1,5 +1,6 @@
 using ExpenseTracker.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseTracker.Controllers
 {
@@ -13,25 +14,39 @@ namespace ExpenseTracker.Controllers
             _authService = authService;
         }
 
+        public record RegisterRequest(
+            string FullName,
+            string Email,
+            string Password
+        );
+
         [HttpPost("register")]
-        public async Task<IActionResult> Register(string fullName, string email, string password)
+        public async Task<IActionResult> Register(RegisterRequest request)
         {
-            var result = await _authService.RegisterAsync(fullName, email, password);
-            return Ok(result);
-        }
-        
-        [HttpPost("login")]
-        public async Task<IActionResult> Login(string email, string password)
-        {
-            var result = await _authService.LoginAsync(email, password);
+            var result = await _authService.RegisterAsync(request.FullName, request.Email, request.Password);
             return Ok(result);
         }
 
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        public record LoginRequest(
+            string Email,
+            string Password
+        );
+        
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(LoginRequest request)
         {
-            await _authService.LogoutAsync();
-            return Ok(new { message = "Logged out successfully." });
+            var result = await _authService.LoginAsync(request.Email, request.Password);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            return Ok(new
+            {
+                message = "Logout successful. Delete the token on the client."
+            });
         }
     }
 }

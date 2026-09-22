@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ExpenseTracker.Repositories;
+using ExpenseTracker.Services;
 
 namespace ExpenseTracker
 {
@@ -64,7 +66,7 @@ namespace ExpenseTracker
             builder.Services.AddAuthentication();
             builder.Services.AddAuthorization();
             builder.Services.AddScoped<IExpenseService, ExpenseService>();
-
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
 
             // Register your services and repositories here
             builder.Services.AddScoped<IAuthService, AuthService>();

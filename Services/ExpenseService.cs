@@ -32,10 +32,13 @@ namespace ExpenseTracker.Services
             return expense;
         }
 
-        public async Task<bool> UpdateExpenseAsync(Expense expense, string userId)
+        public async Task<Expense?> UpdateExpenseAsync(Expense expense, string userId)
         {
             var existingExpense = await GetExpenseByIdAsync(expense.Id, userId);
-            if (existingExpense == null) return false;
+            if (existingExpense == null)
+            {
+                return null;
+            }
 
             existingExpense.Title = expense.Title;
             existingExpense.Description = expense.Description;
@@ -44,7 +47,7 @@ namespace ExpenseTracker.Services
 
             _context.Expenses.Update(existingExpense);
             await _context.SaveChangesAsync();
-            return true;
+            return existingExpense;
         }
 
         public async Task<bool> DeleteExpenseAsync(int id, string userId)

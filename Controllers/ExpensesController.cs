@@ -55,7 +55,8 @@ namespace ExpenseTracker.Controllers
             string Title,
             string Description,
             decimal Price,
-            DateTime Date
+            DateTime Date,
+            int CategoryId
         );
         // POST: api/expenses
         [HttpPost]
@@ -89,7 +90,8 @@ namespace ExpenseTracker.Controllers
             string Title,
             string Description,
             decimal Price,
-            DateTime Date
+            DateTime Date,
+            int CategoryId
         );
         // PUT: api/expenses/{id}
         [HttpPut("{id}")]
@@ -115,9 +117,16 @@ namespace ExpenseTracker.Controllers
             expense.Title = expenseDto.Title;
             expense.Description = expenseDto.Description;
             expense.Price = expenseDto.Price;
+            expense.CategoryId = expenseDto.CategoryId;
             expense.Date = expenseDto.Date;
 
             var updatedExpense = await _expenseService.UpdateExpenseAsync(expense, userId);
+
+            if (updatedExpense == null)
+            {
+                return NotFound();
+            }
+
             return Ok(updatedExpense);
         }
     }
